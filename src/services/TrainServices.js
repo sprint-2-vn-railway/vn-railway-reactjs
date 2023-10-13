@@ -17,3 +17,9 @@ export const getAllCoachByTrainId = async (trainId) => {
         (`http://localhost:8080/api/booking/get-all-coach-by-train-id/${trainId}`);
     return result;
 }
+
+export const getAllSeatByCoachIdAndTrip = async (coach, train) => {
+    const result = await axios.get
+    (`http://localhost:8080/api/booking/get-seat/${coach.coachId}/${train.firstTripId}/${train.lastTripId}`);
+    return result;
+}

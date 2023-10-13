@@ -6,7 +6,9 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 import { Route, Routes } from 'react-router-dom';
 import Booking from './components/Booking';
 import Login from './components/Login';
+import { axiosClient } from './services/AxiosClient';
 function App() {
+  axiosClient()
   return (
     <>
       <Routes>

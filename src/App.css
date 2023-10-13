@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+/* Tạo animation với tên scroll-text */
+@keyframes scroll-text {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%); /* Chạy ngang từ phải qua trái */
+  }
+}
+
+/* Container để giới hạn vùng hiển thị và ẩn vùng văn bản nằm ngoài khung */
+.scrolling-text-container {
+  width: 300px; /* Điều chỉnh chiều rộng của vùng hiển thị */
+  overflow: hidden;
+}
+
+/* Vùng văn bản cần chạy ngang */
+.scrolling-text {
+  animation: scroll-text 10s linear infinite; /* Thời gian và kiểu hoạt hình có thể điều chỉnh */
+  white-space: nowrap; /* Ngăn dòng chữ bị ngắt khi chạy */
+}
+

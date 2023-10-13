@@ -2,29 +2,33 @@ import React from 'react';
 import train_coach from '../../img/train-coach.png';
 import train_header from '../../img/train-header.png';
 const TrainDetails = ({ props, onOpenCoach }) => {
+
     return (
-        <div >
-            <div className='d-flex justify-content-start ' style={{ width: '20%', height: '40%' }}>
-                {
-                    props.map((value, index) => {
-                        return (
+
+        <div className='d-flex justify-content-center' style={{ width: '100%' }}>
+            {
+                props.map((value, index) => {
+                    return (
+                        <div>
                             <img
                                 onClick={() => onOpenCoach(value)}
                                 src={train_coach}
-                                style={{ width: '100%', height: '100%' }}
+                                style={{ width: '100%', height: '30px' }}
                                 key={`TRAIN_${index}`}
                                 alt='Toa tàu'
                             />
-                        )
+                            <div className='text-center'>{value.coachCode}</div>
+                        </div>
+                    )
 
-                    })
-                }
+                })
+            }
+            
+            <img 
+            style={{ width: '7%', height: '30px' }}
+            src={train_header} 
+            />
 
-                <img src={train_header} style={{ width: '100%', height: '100%' }} />
-            </div>
-            <div >
-
-            </div>
 
         </div>
     );

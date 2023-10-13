@@ -1,15 +1,36 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import * as appUserService from '../services/AppUserService';
+import Swal from "sweetalert2";
 
 const Login = () => {
+    const navigate = useNavigate();
+    const handleLogin = async () => {
+        let userName = document.getElementById('userName').value;
+        let password = document.getElementById('password').value;
+        const appUser = {
+            userName: userName,
+            password: password
+        }
+        try {
+            const result = await appUserService.loginByUserName(appUser);
+            appUserService.addJwtTokenToLocalStorage(result.data);
+            navigate("/home")
+        } catch (e) {
+            Swal.fire({
+                icon: 'error',
+                text: 'Tài khoản hoặc mật khẩu không đúng',
+            })
+        }
 
+    }
     return (
-        <>
-            <section className="bg-primary-subtle mt-5 p-3 p-md-4 p-xl-5 ">
-                <div className="container">
+        <body className="bg-primary-subtle p-5" style={{height: '835px '}}>
+            <section className="bg-primary-subtle p-5 p-md-4 p-xl-5 ">
+                <div className="container p-4">
                     <div className="row justify-content-center">
-                        <div className="col-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5">
-                            <div className="card border-0 shadow-sm rounded-4">
+                        <div className="col-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5 ">
+                            <div className="card border-0 shadow-sm rounded-4 ">
                                 <div className="card-body p-3 p-md-4 p-xl-5">
                                     <div className="row">
                                         <div className="col-12">
@@ -18,35 +39,43 @@ const Login = () => {
                                             </div>
                                         </div>
                                     </div>
+
                                     <div className="row gy-3 overflow-hidden">
                                         <div className="col-12">
                                             <div className="form-floating mb-3">
-                                                <input type="userName" className="form-control" name="userName" id="userName" placeholder="name@example.com" />
+                                                <input type="text" className="form-control"
+                                                    name="userName" id="userName" placeholder="name@example.com" />
                                                 <label htmlFor="userName" className="form-label">Tài khoản</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="form-floating mb-3">
-                                                <input type="password" className="form-control" name="password" id="password"  placeholder="Password" required />
+                                                <input type="password" className="form-control"
+                                                    name="password" id="password" placeholder="Password" required />
                                                 <label htmlFor="password" className="form-label">Mật khẩu</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="form-check">
-                                                <input className="form-check-input" type="checkbox" defaultValue name="remember_me" id="remember_me" />
-                                                <label className="form-check-label text-secondary" htmlFor="remember_me">
+                                                <input className="form-check-input" type="checkbox"
+                                                    defaultValue name="rememberMe" id="rememberMe" />
+                                                <label className="form-check-label text-secondary" htmlFor="rememberMe">
                                                     Duy trì đăng nhập
                                                 </label>
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="d-grid">
-                                                <button className="btn bsb-btn-3xl btn-primary">
+                                                <button className="btn bsb-btn-3xl btn-primary"
+                                                    type="button"
+                                                    onClick={() => handleLogin()}
+                                                >
                                                     Đăng nhập
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div className="row">
                                         <div className="col-12">
                                             <hr className="mt-5 mb-4 border-secondary-subtle" />
@@ -73,7 +102,7 @@ const Login = () => {
                                                     </svg>
                                                     <span className="ms-2 fs-6 text-uppercase">Facebook</span>
                                                 </a>
-                                              
+
                                             </div>
                                         </div>
                                     </div>
@@ -83,8 +112,8 @@ const Login = () => {
                     </div>
                 </div>
             </section>
+        </body>
 
-        </>
     )
 }
 

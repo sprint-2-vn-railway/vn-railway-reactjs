@@ -28,7 +28,7 @@ const Footer = () => {
                         </div>
                     </div>
                 </section>
-                <div className="text-center p-4 text-light bg-dark">
+                <div className="text-center p-4 text-light bg-secondary">
                     © 2023
                     Ngô Hữu Hoàng Nhật
                 </div>
