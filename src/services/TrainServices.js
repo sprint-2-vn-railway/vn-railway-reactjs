@@ -20,6 +20,18 @@ export const getAllCoachByTrainId = async (trainId) => {
 
 export const getAllSeatByCoachIdAndTrip = async (coach, train) => {
     const result = await axios.get
-    (`http://localhost:8080/api/booking/get-seat/${coach.coachId}/${train.firstTripId}/${train.lastTripId}`);
+        (`http://localhost:8080/api/booking/get-seat/${coach.coachId}/${train.firstTripId}/${train.lastTripId}`);
+    return result;
+}
+
+export const clearAllTemporary = async (userName) => {
+    const result = await axios.get
+    (`http://localhost:8080/api/booking/clear-temporary/${userName}`)
+    return result;
+}
+
+export const getAllTemporarySeatByUserName = async (userName) => {
+    const result = await axios.get
+    (`http://localhost:8080/api/seat/get-all-temporary-seat-by-userName/${userName}`)
     return result;
 }

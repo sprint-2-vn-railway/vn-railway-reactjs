@@ -1,6 +1,7 @@
 import React from 'react';
 import train_coach from '../../img/train-coach.png';
 import train_header from '../../img/train-header.png';
+
 const TrainDetails = ({ props, onOpenCoach }) => {
 
     return (
@@ -9,12 +10,12 @@ const TrainDetails = ({ props, onOpenCoach }) => {
             {
                 props.map((value, index) => {
                     return (
-                        <div>
+                        <div  key={`TRAIN_${index}`}>
                             <img
                                 onClick={() => onOpenCoach(value)}
                                 src={train_coach}
                                 style={{ width: '100%', height: '30px' }}
-                                key={`TRAIN_${index}`}
+                               
                                 alt='Toa tàu'
                             />
                             <div className='text-center'>{value.coachCode}</div>

@@ -8,33 +8,46 @@ import TrainDetails from "./Trains/TrainDetails";
 import Coach from "./Trains/Coach";
 import * as trainService from '../services/TrainServices';
 import Swal from "sweetalert2";
+import { parseDate } from "../services/ParseDate";
+import * as bookingService from "../services/BookingService";
+import * as appUserService from "../services/AppUserService";
+import logo_vn_pay from '../img/logo_vn_pay.webp';
 
 const Booking = () => {
     const [stationList, setStationList] = useState();
     const [trainList, setTrainList] = useState();
-    const [coachList, setCoachList] = useState();
-    const [seatList, setSeatList] = useState();
     const [train, setTrain] = useState();
     const [coach, setCoach] = useState();
-    const [listSelected, setListSelected] = useState([]);
+    const [coachList, setCoachList] = useState();
+    const [seatList, setSeatList] = useState();
+    const [listSelected, setListSelected] = useState();
+    const user = appUserService.infoAppUserByJwtToken();
+
+    const getAllSeat = async () => {
+        try {
+            const result = await trainService.getAllSeatByCoachIdAndTrip(coach, train);
+            setSeatList(result.data)
+        } catch (e) {
+            console.log("This err >>> " + e);
+        }
+    }
+
+
     const choseTrain = async (value) => {
         try {
             const result = await trainService.getAllCoachByTrainId(value.trainId)
             setCoachList(result.data);
             setTrain(value)
+            setSeatList(undefined)
         } catch (e) {
-
+            console.log(e);
         }
     }
-    const choseCoach = async (value) => {
+
+    const choseCoach = (value) => {
         setCoach(value)
-        try {
-            const result = await trainService.getAllSeatByCoachIdAndTrip(value, train);
-            setSeatList(result.data)
-        } catch (e) {
-
-        }
     }
+
     const getAllStation = async () => {
         try {
             const result = await trainService.getAllStation();
@@ -43,6 +56,7 @@ const Booking = () => {
 
         }
     }
+
     const getAllTrainInDate = async (value) => {
         if (value.fromStation == value.toStation) {
             Swal.fire({
@@ -61,39 +75,60 @@ const Booking = () => {
                 setCoachList(undefined)
                 setSeatList(undefined)
             } catch (e) {
-
+                console.log(e);
             }
         }
     }
 
-    const choseSeat = async (value) => {
-        addSeatSelectedDetailsToList(value)
+    const handleSelected = async (userName) => {
+        try {
+            const result = await trainService.getAllTemporarySeatByUserName(userName)
+            setListSelected(result.data)
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    const addSeatSelectedDetailsToList = (value) => {
-        const seatSelectedDetail =
-        {
-            selectedTrain: train,
-            selectedCoach: coach,
-            selectedSeat: value,
+    const handleSeatLimit = () => {
+        console.log("handle");
+        Swal.fire({
+            icon: 'error',
+            text: "Bạn chỉ được giữ tối đa 5 ghế!"
+
+        })
+    }
+
+
+
+    const handlePayment = async () => {
+
+        try {
+            const result = await bookingService.redirectToVNPay(user.sub);
+            if (result?.data?.url) {
+                window.location.href = result.data.url;
+            }
+
+
+        } catch (e) {
+            console.log(e);
         }
 
-        // const checkInclude = listSelected.some((element) =>
-        //     element?.selectedSeat?.seatCode === seatSelectedDetail?.selectedSeat?.seatCode);
-        // if (checkInclude) {
-        //     setListSelected((prev) => prev.filter((item) =>
-        //         item?.selectedSeat?.seatCode !== seatSelectedDetail?.selectedSeat?.seatCode));
-        // } else {
-            setListSelected((prev) => [...prev, seatSelectedDetail]);
-        // }
+
     }
+
+    useEffect(() => {
+        if (coach && train) {
+            getAllSeat()
+        }
+
+    }, [coach])
 
     useEffect(() => {
         getAllStation()
     }, [])
 
     if (!stationList) return null;
-    console.log(listSelected);
+
     return (
         <>
 
@@ -102,54 +137,68 @@ const Booking = () => {
 
                 <div className="row ">
 
+                    <div className="row col-lg-9 col-md-9 col-sm-12 col-xl-9  ">
+                        <div className=" position-relative">
+                            <div className="position-sticky top-0">
+                                <h1 className="text-center mt-3 ">Đặt Vé Tàu</h1>
+                                {
+                                    !trainList ?
 
-                    <div className="row col-lg-9 col-md-9 col-sm-12 col-xl-9 ">
-                        <div>
-                            <h1 className="text-center mt-3">Đặt Vé Tàu</h1>
-                            {
-                                !trainList ?
+                                        <h3 className="text-center">Hãy chọn ga xuất phát, ga đích và ngày xuất phát</h3>
 
-                                    <h3 className="text-center">Hãy chọn ga xuất phát, ga đích và ngày xuất phát</h3>
-
-                                    :
-                                    trainList.length != 0 ?
-                                        <div className="d-flex justify-content-center">
-                                            {trainList.map((value, index) => {
-
-                                                return <div key={`TR_${index}`} className="col-sm-12 col-md-6 col-lg-3 col-xl-3"
-                                                    onClick={() => choseTrain(value)}
-                                                >
-                                                    <Train props={value} />
-                                                </div>
-                                            })}
-                                        </div>
                                         :
-                                        <div className="d-flex align-items-center justify-content-center">
-                                            <h3>Xin lỗi, không có tàu nào hoạt động trong ngày này, vui lòng chọn ngày khác</h3>
+                                        trainList.length != 0 ?
+                                            <div className="d-flex justify-content-center">
+                                                {trainList.map((value, index) => {
+
+                                                    return <div
+                                                        key={`TR_${index}`}
+                                                        className="col-sm-12 col-md-6 col-lg-3 col-xl-3"
+                                                        onClick={() => choseTrain(value)}
+                                                    >
+                                                        <Train props={value} />
+                                                    </div>
+                                                })}
+                                            </div>
+                                            :
+                                            <div className="d-flex align-items-center justify-content-center">
+                                                <h3>Xin lỗi, không có tàu nào hoạt động trong ngày này, vui lòng chọn ngày khác</h3>
+                                            </div>
+
+                                }
+
+                                {
+                                    trainList &&
+                                    <>
+                                        <div className="d-flex justify-content-center mb-5">
+                                            {
+                                                coachList && <TrainDetails props={coachList} onOpenCoach={choseCoach} />
+
+                                            }
                                         </div>
 
-                            }
-                            {
-                                trainList &&
-                                <>
-                                    <div className="d-flex justify-content-center">
                                         {
-                                            coachList && <TrainDetails props={coachList} onOpenCoach={choseCoach} />
+                                            coach &&
+                                            <div className="">
 
+                                                {
+                                                    seatList &&
+                                                    <Coach
+                                                        onSelected={handleSelected}
+                                                        coach={coach}
+                                                        train={train}
+                                                        handleSeatLimitFive={handleSeatLimit}
+                                                    />
+                                                }
+                                            </div>
                                         }
-                                    </div>
-                                    <div className="text-center">
-                                        {
-                                            seatList && <Coach props={seatList}
-                                                onChoseSeat={choseSeat}
-                                            />
-                                        }
-                                    </div>
-                                </>
-                            }
+
+                                    </>
+                                }
+                            </div>
                         </div>
                     </div>
-                    <div className="col-lg-3 col-md-3 col-sm-12 col-xl-3 position-relative "
+                    <div className="col-lg-3  col-md-3 col-sm-12 col-xl-3 position-relative "
 
                     >
                         <div className="shadow-lg p-3 
@@ -210,33 +259,45 @@ const Booking = () => {
                                 </Form>
                             </Formik>
                             <hr />
+
                             {
-                                listSelected.length > 0 ?
+                                (listSelected && listSelected.length > 0) ?
                                     <>
+                                        <div className="fs-3 text-center ">Các ghế đã chọn</div>
                                         {
                                             listSelected.map((value, index) => {
                                                 return (
-                                                    <div key={`SD_${index}`}>
-                                                        <div div className="d-flex justify-content-between" >
+                                                    <div key={`SD_${index}`} className="text-sm mt-1">
+                                                        <div className="d-flex justify-content-between " >
                                                             <div>
-                                                                <div>
-                                                                    Tàu: {value.selectedTrain.trainCode}
-                                                                </div>
-                                                                <div>
-                                                                    Toa: {value.selectedCoach.coachCode}
-                                                                </div>
-
-                                                                <div>
-                                                                    Ghế đã chọn: {value?.selectedSeat?.seatCode}
-                                                                </div>
-
+                                                                Tàu: {value?.trainCode}
                                                             </div>
+                                                            <div>
+                                                                Toa: {value?.coachCode}
+                                                            </div>
+                                                            <div>
+                                                                Ghế: {value?.seatCode}
+                                                            </div>
+                                                        </div >
+                                                        <div className="d-flex justify-content-between mt-1 ">
+                                                            <div> Ngày Đi: </div>
+                                                            <div>{parseDate(value?.startDate)}</div>
                                                         </div>
-
+                                                        <hr />
                                                     </div>
-
                                                 )
                                             })}
+                                        <div className="btn btn-warning w-100 mt-1 fw-bolder "
+                                            onClick={() => handlePayment()}
+                                        >
+                                            <img src={logo_vn_pay} 
+                                            style={{
+                                                width: '15%',
+                                                height: '15%'
+                                            }}/>
+                                            &nbsp;
+                                             Thanh toán VN-PAY
+                                        </div>
                                     </> : ""
                             }
 
@@ -245,8 +306,6 @@ const Booking = () => {
                     </div>
                 </div >
             </div >
-
-
             <Footer />
         </>
     );

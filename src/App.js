@@ -7,16 +7,30 @@ import { Route, Routes } from 'react-router-dom';
 import Booking from './components/Booking';
 import Login from './components/Login';
 import { axiosClient } from './services/AxiosClient';
+import { Suspense } from 'react';
+import Loading from './components/common/Loading';
+import CreateTrip from './components/user/CreateTrip';
+import PaymentSuccess from './components/payment_success/PaymentSuccess';
 function App() {
   axiosClient()
   return (
     <>
-      <Routes>
-        <Route path='/login' element={<Login />} />
-        <Route path='/home' element={<Home />} />
-        <Route path='/booking' element={<Booking />} />
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path='/home' element={<Home />} />
+          <Route path='*' element={<Home />} />
+          <Route path='/login' element={<Login />} />
+          {/* Booking */}
 
-      </Routes>
+          <Route path='/booking' element={<Booking />} />
+          {/* Train,  */}
+          <Route path='/create-trip' element={<CreateTrip />} />
+
+          {/* Payment success */}
+          <Route path='/payment-success' element={<PaymentSuccess />} />
+        </Routes>
+      </Suspense>
+
     </>
   );
 }

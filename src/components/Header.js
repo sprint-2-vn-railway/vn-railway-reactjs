@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import * as appUserService from '../services/AppUserService';
 
 const Header = () => {
+    const navigate = useNavigate();
     const user = appUserService.infoAppUserByJwtToken();
     const handleLogout = () => {
-        appUserService.logout();
+        appUserService.logout();  
+        navigate("/home")
+
     }
     return (
         <>
