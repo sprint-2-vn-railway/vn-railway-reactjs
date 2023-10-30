@@ -59,13 +59,17 @@ const Coach = ({ onSelected, coach, train, handleSeatLimitFive }) => {
     }
 
     const handleReceived = (payload) => {
-        if (payload.body === "limited") {
+        console.log(payload.body);
+        if (payload.body === "limited"+user.sub) {
             handleSeatLimitFive()
         }
         getAllSeat()
     }
 
     useEffect(() => {
+        if(stompClient){
+            closeConnect()
+        }
         sock = new SockJS('http://localhost:8080/ws');
         stompClient = stompjs.over(sock);
 

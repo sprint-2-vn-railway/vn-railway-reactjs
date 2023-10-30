@@ -28,7 +28,7 @@ const Booking = () => {
             const result = await trainService.getAllSeatByCoachIdAndTrip(coach, train);
             setSeatList(result.data)
         } catch (e) {
-            console.log("This err >>> " + e);
+            console.log(e);
         }
     }
 
@@ -45,6 +45,7 @@ const Booking = () => {
     }
 
     const choseCoach = (value) => {
+        console.log(value,train);
         setCoach(value)
     }
 
@@ -57,7 +58,7 @@ const Booking = () => {
         }
     }
 
-    const getAllTrainInDate = async (value) => {
+    const getAllTrainInDate = async (value, setErrors) => {
         if (value.fromStation == value.toStation) {
             Swal.fire({
                 icon: 'error',
@@ -76,6 +77,9 @@ const Booking = () => {
                 setSeatList(undefined)
             } catch (e) {
                 console.log(e);
+                if (e.response.status == 400) {
+                    setErrors(e.response.data)
+                }
             }
         }
     }
@@ -131,7 +135,7 @@ const Booking = () => {
 
     return (
         <>
-
+            <title>Đặt Vé</title>
             <Header />
             <div className="container-fluid bg-body-tertiary" >
 
@@ -213,15 +217,21 @@ const Booking = () => {
                                 }}
                                 validationSchema={Yup.object({
                                     fromStation: Yup.string()
-                                        .required("Không để trống ga đi"),
+                                        .required("Không để trống ga đi")
+                                        .test('check-exist', "Không tồn tại ga này", (value) => stationList.some((e) => value === e))
+                                    ,
                                     toStation: Yup.string()
-                                        .required("Không để trống ga đến"),
+                                        .required("Không để trống ga đến")
+                                        .test('check-exist', "Không tồn tại ga này", (value) => stationList.some((e) => value === e))
+                                    ,
                                     startDate: Yup.date()
                                         .required("Không để trống ngày đi")
+                                        // .min(new Date(), "Hãy chọn ngày lớn hơn hoặc bằng hiện tại")
+                                    ,
                                 })}
-                                onSubmit={(value, { setSubmitting }) => {
+                                onSubmit={(value, { setSubmitting, setErrors }) => {
                                     setSubmitting(false);
-                                    getAllTrainInDate(value);
+                                    getAllTrainInDate(value, setErrors);
                                 }}
                             >
                                 <Form >
@@ -290,13 +300,13 @@ const Booking = () => {
                                         <div className="btn btn-warning w-100 mt-1 fw-bolder "
                                             onClick={() => handlePayment()}
                                         >
-                                            <img src={logo_vn_pay} 
-                                            style={{
-                                                width: '15%',
-                                                height: '15%'
-                                            }}/>
+                                            <img src={logo_vn_pay}
+                                                style={{
+                                                    width: '15%',
+                                                    height: '15%'
+                                                }} />
                                             &nbsp;
-                                             Thanh toán VN-PAY
+                                            Thanh toán VN-PAY
                                         </div>
                                     </> : ""
                             }

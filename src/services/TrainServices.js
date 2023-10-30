@@ -35,3 +35,9 @@ export const getAllTemporarySeatByUserName = async (userName) => {
     (`http://localhost:8080/api/seat/get-all-temporary-seat-by-userName/${userName}`)
     return result;
 }
+
+export const getAllCurrentTrain = async () => {
+    const result = await axios.get
+    (`http://localhost:8080/api/train/list`)
+    return result;
+}

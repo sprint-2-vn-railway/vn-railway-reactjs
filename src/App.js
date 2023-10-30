@@ -7,29 +7,37 @@ import { Route, Routes } from 'react-router-dom';
 import Booking from './components/Booking';
 import Login from './components/Login';
 import { axiosClient } from './services/AxiosClient';
-import { Suspense } from 'react';
-import Loading from './components/common/Loading';
 import CreateTrip from './components/user/CreateTrip';
 import PaymentSuccess from './components/payment_success/PaymentSuccess';
+import Authentication from './components/user/Authentication';
+import AdminRequired from './components/user/AdminRequired';
+import Error401 from './components/user/Error401';
+import Error403 from './components/user/Error403';
+import * as appUserService from './services/AppUserService';
+
 function App() {
   axiosClient()
   return (
     <>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path='/home' element={<Home />} />
-          <Route path='*' element={<Home />} />
-          <Route path='/login' element={<Login />} />
-          {/* Booking */}
-
+      <Routes>
+        <Route path='/home' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='*' element={<Home />} />
+        <Route path='/401' element={<Error401 />} />
+        <Route path='/403' element={<Error403 />} />
+        {/* Booking */}
+        <Route element={<Authentication />}>
           <Route path='/booking' element={<Booking />} />
-          {/* Train,  */}
-          <Route path='/create-trip' element={<CreateTrip />} />
-
-          {/* Payment success */}
           <Route path='/payment-success' element={<PaymentSuccess />} />
-        </Routes>
-      </Suspense>
+
+          <Route element={<AdminRequired />}>
+            {/* Trip,  */}
+            <Route path='/create-trip' element={<CreateTrip />} />
+          </Route>
+          {/* Payment success */}
+        </Route>
+
+      </Routes>
 
     </>
   );
